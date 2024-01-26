@@ -1,0 +1,41 @@
+*{
+    padding: 0;
+    margin: 0;
+
+}
+h1{
+    color: blueviolet;
+    font-weight: bold;
+    text-align: center;
+
+
+}
+a{
+ margin-right: 30px;
+ font-size: 40px;   
+ text-decoration: none;
+ border: 1px solid black;
+ border-radius: 5px;
+}
+.main{
+    position: fixed;
+    z-index: 100;
+    width: 100%;
+    
+    background-color: rgb(229, 148, 161);
+    /* &:hover{
+        background-color: pink;
+        color: black;
+        transition: 5s;
+    } */
+
+}
+img{
+    margin-left: 29%;
+    padding-top: 10%;
+}
+a:hover{
+    background-color: aqua;
+    transition: 2s;
+
+}
