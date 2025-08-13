@@ -18,7 +18,7 @@
     "axios": "^1.6.2",
     "cheerio": "^1.0.0-rc.12",
     "puppeteer": "^21.6.1",
-    "sqlite3": "^5.1.6",
+    "mongoose": "^8.0.3",
     "snoowrap": "^1.23.0",
     "openai": "^4.20.1",
     "helmet": "^7.1.0",
