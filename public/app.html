@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper & Reddit AI Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            height: fit-content;
+        }
+
+        .content-area {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e1e5e9;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e1e5e9;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .reddit-post {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .reddit-post:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 12px;
+        }
+
+        .post-subreddit {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .post-score {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #666;
+            font-size: 14px;
+            margin-left: auto;
+        }
+
+        .post-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .post-content {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .ai-suggestion-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .ai-suggestion-box h3 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-suggestion-box textarea {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .ai-suggestion-box textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .suggestions-list {
+            margin-top: 15px;
+        }
+
+        .suggestion-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .user-setup {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .competitor-url {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .competitor-url input {
+            flex: 1;
+        }
+
+        .remove-url {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> Web Scraper & Reddit AI Assistant</h1>
+            <p>Scrape websites, analyze competitors, and get AI-powered Reddit engagement suggestions</p>
+        </div>
+
+        <!-- User Setup -->
+        <div class="user-setup" id="userSetup">
+            <h2><i class="fas fa-user-cog"></i> User Setup</h2>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="websiteUrl">Your Website URL</label>
+                <input type="url" id="websiteUrl" placeholder="https://yourwebsite.com">
+            </div>
+            <div class="form-group">
+                <label>Competitor URLs (up to 5)</label>
+                <div id="competitorUrls">
+                    <div class="competitor-url">
+                        <input type="url" placeholder="https://competitor1.com">
+                        <button type="button" class="remove-url" onclick="removeCompetitorUrl(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addCompetitorUrl()">
+                    <i class="fas fa-plus"></i> Add Competitor
+                </button>
+            </div>
+            <button class="btn btn-primary" onclick="createUser()">
+                <i class="fas fa-save"></i> Save User
+            </button>
+        </div>
+
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h3><i class="fas fa-cogs"></i> Actions</h3>
+                
+                <div class="form-group">
+                    <button class="btn btn-primary" onclick="startScraping()" style="width: 100%; margin-bottom: 15px;">
+                        <i class="fas fa-spider"></i> Start Scraping
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="subredditInput">Search Subreddit</label>
+                    <input type="text" id="subredditInput" placeholder="technology, business, etc.">
+                    <button class="btn btn-primary" onclick="searchReddit()" style="width: 100%; margin-top: 10px;">
+                        <i class="fab fa-reddit"></i> Search Reddit
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="domainSearch">Search by Domain</label>
+                    <input type="text" id="domainSearch" placeholder="example.com">
+                    <button class="btn btn-primary" onclick="searchByDomain()" style="width: 100%; margin-top: 10px;">
+                        <i class="fas fa-search"></i> Domain Search
+                    </button>
+                </div>
+
+                <div id="statusIndicators">
+                    <h4>Service Status</h4>
+                    <div id="redditStatus" class="status-indicator status-warning">
+                        <i class="fas fa-clock"></i> Reddit: Checking...
+                    </div>
+                    <div id="aiStatus" class="status-indicator status-warning">
+                        <i class="fas fa-clock"></i> AI: Checking...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('reddit-posts')">
+                        <i class="fab fa-reddit"></i> Reddit Posts
+                    </button>
+                    <button class="tab" onclick="showTab('scraped-data')">
+                        <i class="fas fa-spider"></i> Scraped Data
+                    </button>
+                    <button class="tab" onclick="showTab('ai-suggestions')">
+                        <i class="fas fa-robot"></i> AI Suggestions
+                    </button>
+                </div>
+
+                <!-- Reddit Posts Tab -->
+                <div id="reddit-posts" class="tab-content active">
+                    <div id="redditPostsContainer">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Ready to search Reddit posts...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scraped Data Tab -->
+                <div id="scraped-data" class="tab-content">
+                    <div id="scrapedDataContainer">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Ready to scrape websites...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Suggestions Tab -->
+                <div id="ai-suggestions" class="tab-content">
+                    <div id="aiSuggestionsContainer">
+                        <div class="loading">
+                            <p>AI suggestions will appear here after you interact with Reddit posts...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Suggestion Box (appears when clicking on a post) -->
+        <div id="aiSuggestionBox" class="ai-suggestion-box" style="display: none;">
+            <h3><i class="fas fa-robot"></i> AI Comment Suggestions</h3>
+            <div class="form-group">
+                <label>Tone</label>
+                <select id="aiTone">
+                    <option value="helpful">Helpful</option>
+                    <option value="conversational">Conversational</option>
+                    <option value="professional">Professional</option>
+                    <option value="casual">Casual</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Length</label>
+                <select id="aiLength">
+                    <option value="short">Short</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="long">Long</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Additional Context (optional)</label>
+                <textarea id="userContext" placeholder="Add any specific context or requirements..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="generateAISuggestion()">
+                <i class="fas fa-magic"></i> Generate Suggestion
+            </button>
+            <div id="suggestionsList" class="suggestions-list"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
